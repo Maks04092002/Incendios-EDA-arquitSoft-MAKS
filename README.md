@@ -2,7 +2,8 @@
 
 **Curso:** Arquitectura de Software (IS-488)  
 **Institución:** Universidad Nacional de San Cristóbal de Huamanga (UNSCH)  
-**Docente:** Mg. Ing. Richard Zapata Casaverde  
+**Escuela** EP Ingenieria de Sistemas
+**Docente:** Mg. Ing. Richard Zapata Casaverde  / Ing. Lizbeth Jaico Quispe
 
 ---
 
