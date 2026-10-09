@@ -1,0 +1,10 @@
+# Registro de Decisiones Arquitectónicas (ADRs)
+
+El presente documento registra las decisiones de arquitectura adoptadas para responder a los drivers arquitectónicos y atributos de calidad definidos para el sistema de detección temprana de incendios forestales en el Perú.
+
+| ID | Decisión arquitectónica | Driver relacionado | Justificación | Resultado |
+| :--- | :--- | :--- | :--- | :--- |
+| **ADR-001** | Arquitectura Dirigida por Eventos (EDA) con Bus de Mensajes | DA01 - Latencia <br> DA02 - Event Broker <br> DA03 - Resiliencia | Permite asimilar el volumen masivo y heterogéneo de flujos satelitales (NASA FIRMS, GOES-16, Copernicus) de forma asíncrona, garantizando la recepción y desacoplamiento mediante particionamiento regional. | Implementación de Apache Kafka / RabbitMQ como Message Broker distribuido con garantía *at-least-once*. |
+| **ADR-002** | Motor de Procesamiento en Flujo Continuo (CEP) | DA01 - Latencia <br> DA03 - Resiliencia | Evalúa anomalías térmicas (temperaturas de brillo > 310 K) e índices de vegetación en ventanas de tiempo reales sin saturar la base de datos relacional mediante procesamiento por lotes (*batch*). | Despliegue de Apache Flink / Spark Streaming integrado a los tópicos del Bus de Eventos. |
+| **ADR-003** | Persistencia Especializada Espacio-Temporal | DA05 - Base de Datos GIS | El sistema requiere realizar consultas geométricas complejas sobre coberturas vegetales del Perú y almacenar series temporales masivas de focos de calor[cite: 11, 16, 17]. | Base de datos PostgreSQL con extensión espacial PostGIS y motor de series temporales TimescaleDB[cite: 16, 17]. |
+| **ADR-004** | Clean Architecture e Integración por Adaptadores | DA04 - Alertas <br> DA06 - Mantenibilidad | Desacopla la lógica del cálculo de nivel de riesgo de los proveedores de notificaciones externas (Webhooks, SMS, WebSockets) y tecnologías de base de datos. | Módulos desacoplados en 4 capas (*Dominio, Aplicación, Adaptadores, Infraestructura*). |
