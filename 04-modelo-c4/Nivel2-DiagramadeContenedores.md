@@ -1,57 +1,34 @@
-# C4 Nivel 2: Diagrama de Contenedores (Containers)
-
-## 1. Descripción General
-El Diagrama de Contenedores muestra la arquitectura de software de alto nivel, identificando las aplicaciones, bases de datos y almacenes de datos que componen el sistema GoPet.
-
----
-
-## 2. Diagrama de Contenedores
-
-```mermaid
 graph TB
-    subgraph Usuarios ["👥 Usuarios"]
-        U["📱 Cliente / Seller / Admin"]
+    subgraph Cliente ["🌐 Capa de Presentación WebGIS"]
+        WEB["💻 Plataforma WebGIS<br/>[Contenedor: React + Leaflet]<br/>Visualización de mapas de puntos de calor y panel de alertas."]
     end
 
-    subgraph GoPet ["📦 Sistema Marketplace GoPet"]
-        WEB["💻 Aplicación Web<br/>[Contenedor: Next.js / React]<br/>Interfáz gráfica responsiva para usuarios."]
+    subgraph Backend ["📦 Microservicios y Bus de Eventos"]
+        INGEST["🐍 Servicio de Ingesta Satelital<br/>[Contenedor: Python / FastAPI]<br/>Consulta periódicamente NASA FIRMS y emite eventos."]
         
-        API["🚀 API Backend<br/>[Contenedor: Node.js / Express]<br/>Proporciona la lógica de negocio vía REST API."]
+        BUS[("🐇 Bus de Eventos<br/>[Contenedor: RabbitMQ]<br/>Enruta eventos 'PuntoCalorDetectado' y 'AlertaGenerada'.")]
         
-        DB[("🗄️ Base de Datos Relacional<br/>[Contenedor: PostgreSQL]<br/>Almacena usuarios, productos, pedidos y pagos.")]
+        PROC["⚡ Servicio de Procesamiento y Alertas<br/>[Contenedor: Python / FastAPI]<br/>Consume eventos, valida filtros espaciales y clasifica el riesgo."]
         
-        CACHE[("⚡ Caché e Inventario Temporal<br/>[Contenedor: Redis]<br/>Almacena carritos de compra y caché de catálogo.")]
+        API["🚀 API REST Gateway<br/>[Contenedor: Python / FastAPI]<br/>Expone endpoints para la plataforma WebGIS."]
     end
 
-    subgraph Externos ["☁️ Sistemas Externos"]
-        PAS["💳 Pasarela de Pagos"]
-        ERP["🏢 ERP Empresarial"]
-        LOG["🚚 Servicio de Envío"]
+    subgraph Persistencia ["💾 Almacenamiento Geoespacial"]
+        DB[("🗄️ Base de Datos Geoespacial<br/>[Contenedor: PostgreSQL + PostGIS]<br/>Guarda coordenadas, fechas, confianza y geometría de incendios.")]
     end
 
-    U -->|HTTPS / HTML / JS| WEB
-    WEB -->|JSON / HTTPS REST| API
+    EXT["🛰️ NASA FIRMS API"]
 
-    API -->|Consultas SQL| DB
-    API -->|Lectura / Escritura rápida| CACHE
+    INGEST -->|HTTPS GET| EXT
+    INGEST -->|Publica evento 'PuntoCalorDetectado'| BUS
+    BUS -->|Consume eventos de anomalías| PROC
+    PROC -->|Publica 'AlertaGenerada' / Guarda datos| DB
+    PROC -->|Notifica alerta| BUS
 
-    API -->|HTTPS / REST| PAS
-    API -->|HTTPS / REST| ERP
-    API -->|HTTPS / REST| LOG
+    WEB -->|HTTPS / REST API| API
+    API -->|Consultas espaciales SQL/PostGIS| DB
 
-    style WEB fill:#7b1fa2,color:#fff,stroke:#4a148c
-    style API fill:#2e7d32,color:#fff,stroke:#1b5e20
-    style DB fill:#e65100,color:#fff,stroke:#bf360c
-    style CACHE fill:#e65100,color:#fff,stroke:#bf360c
-```
-
----
-
-## 3. Especificación de Contenedores
-
-| Contenedor | Tecnología | Responsabilidad |
-| :--- | :--- | :--- |
-| **Aplicación Web** | Next.js / React, Tailwind | Interfaz de usuario para navegación, carrito y panel de administración. |
-| **API Backend** | Node.js, Express, TypeScript | Procesa peticiones HTTP, aplica reglas de negocio y coordina módulos. |
-| **Base de Datos** | PostgreSQL | Persistencia relacional con integridad transaccional ACID. |
-| **Caché** | Redis | Almacenamiento en memoria para sesiones, carritos activos y catálogo frecuente. |
+    style BUS fill:#ff6f00,color:#fff,stroke:#e65100,stroke-width:2px
+    style DB fill:#0277bd,color:#fff,stroke:#01579b,stroke-width:2px
+    style PROC fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:2px
+    style INGEST fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:2px
