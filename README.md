@@ -50,6 +50,60 @@ Este proyecto diseña una arquitectura de software orientada a eventos (EDA) y b
 
 ---
 
+## 🖼️ Galería de Diagramas de Arquitectura (Exportados)
+
+A continuación se presentan los diagramas clave de la arquitectura, patrones y diseño interno exportados desde la herramienta de modelado.
+
+### 🏛️ Modelo C4
+**Nivel 1: Diagrama de Contexto**
+![Contexto](imagen/fuentes-svg/nivel1_contexto_monitoreo_incendios.png)
+
+**Nivel 2: Diagrama de Contenedores**
+![Contenedores](imagen/fuentes-svg/nivel2_contenedores_monitoreo_incendios.png)
+
+**Nivel 3: Diagrama de Componentes (Microservicio CEP)**
+![Componentes](imagen/fuentes-svg/nivel3_componentes_ms_cep.png)
+
+**Nivel 4: Diagrama de Clases**
+![Clases Nivel 4](imagen/fuentes-svg/nivel4-clases.svg.svg)
+
+**Nivel 4: Diagrama de Secuencia**
+![Secuencia Nivel 4](imagen/fuentes-svg/nivel4-secuencia.svg.svg)
+
+---
+
+### 🧩 Patrones de Diseño Aplicados (GoF)
+
+**Patrón Adapter (Integración con NASA FIRMS)**
+![Adapter](imagen/fuentes-svg/patron-adapter.svg.svg)
+
+**Patrón Strategy (Motor de Reglas por Región)**
+![Strategy](imagen/fuentes-svg/patron-strategy.svg.svg)
+
+**Patrón Observer (Event-Driven Architecture)**
+![Observer](imagen/observador-patrón.svg.png)
+
+**Patrón Factory (Creación de Alertas)**
+![Factory](imagen/patron-factory.svg.png)
+
+**Patrón Facade (Consolidación de APIs Satelitales)**
+![Facade](imagen/fachada-patrón.svg.png)
+
+---
+
+### 📐 Principios SOLID y Diseño Interno
+
+**Principio de Inversión de Dependencias (DIP)**
+![Principio DIP](imagen/fuentes-svg/principio-dip.svg.svg)
+
+**Diagrama de Paquetes (Módulo Incendios)**
+![Paquetes](imagen/paquetes-modulo-incendios.svg.png)
+
+**Secuencia: Creación de Alerta Crítica**
+![Secuencia Alerta](imagen/secuencia-crear-alerta.svg.png)
+
+---
+
 ## 🛠️ Tecnologías y Stack Técnico
 - **Ingesta y Microservicios:** Python 3.11, FastAPI, Celery
 - **Event Broker:** RabbitMQ / Apache Kafka (AMQP/TCP)
@@ -94,3 +148,4 @@ graph TB
     BROKER --> NOTIF
     GATEWAY --> DB
     NOTIF -.->|WebSockets / SMS| WEBGIS
+
