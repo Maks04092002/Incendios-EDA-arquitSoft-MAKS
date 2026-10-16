@@ -1,3 +1,5 @@
+# Drivers Arquitectónicos
+
 | ID | Driver Arquitectónico | Origen | ¿Por qué influye en la arquitectura? |
 | :--- | :--- | :--- | :--- |
 | **DA01** | Reducción drástica de latencia en la alerta de incendios. | AC01 – Rendimiento | Exige abandonar procesos por lotes (batch) e implementar un procesamiento continuo de flujos (Stream Processing). |

@@ -6,7 +6,7 @@
 | **Brigadista / Bombero Forestal** | Recibir alertas en tiempo real (SMS/Push) con la geolocalización exacta de focos de calor activos. |
 | **Analista COEN / INDECI** | Monitorear el mapa de calor (WebGIS), evaluar niveles de riesgo y coordinar logística de respuesta. |
 | **Gestor Ambiental SERFOR / MINAM** | Consultar datos históricos, evaluar afectación de áreas naturales protegidas y descargar reportes. |
-| **Administrador del Sistema** | Monitorear la salud de los nodos de mensajería (Kafka), gestionar accesos (JWT) y configurar tópicos regionales. |
+| **Administrador del Sistema** | Monitorear la salud de los nodos de mensajería (RabbitMQ), gestionar accesos (JWT) y configurar tópicos/colas regionales. |
 
 ## Sistemas Externos y Fuentes de Datos
 | Sistema Externo | Tipo de Integración | Función en el Sistema |
