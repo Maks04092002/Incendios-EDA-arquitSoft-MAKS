@@ -1,3 +1,4 @@
+```mermaid
 graph TB
     subgraph Cliente ["🌐 Capa de Presentación WebGIS"]
         WEB["💻 Plataforma WebGIS<br/>[Contenedor: React + Leaflet]<br/>Visualización de mapas de puntos de calor y panel de alertas."]
@@ -32,3 +33,4 @@ graph TB
     style DB fill:#0277bd,color:#fff,stroke:#01579b,stroke-width:2px
     style PROC fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:2px
     style INGEST fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:2px
+```

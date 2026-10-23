@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
     autonumber
     participant FIRMS as 🛰️ NASA FIRMS API
@@ -18,3 +19,4 @@ sequenceDiagram
         Worker->>Rabbit: 8. Publica evento 'AlertaRiesgoIncendio'
         Rabbit-->>WebGIS: 9. Notificación en tiempo real / Actualización de mapa
     end
+```

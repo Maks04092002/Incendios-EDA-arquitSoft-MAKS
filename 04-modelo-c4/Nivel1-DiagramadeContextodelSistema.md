@@ -1,3 +1,4 @@
+```mermaid
 graph TB
     subgraph Actores ["👥 Actores del Sistema"]
         U["👤 Usuario de Monitoreo / Analista<br/>(Consulta puntos de calor y alertas)"]
@@ -20,3 +21,4 @@ graph TB
     style SYS fill:#d84315,color:#fff,stroke:#bf360c,stroke-width:3px
     style Actores fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
     style Externos fill:#eceff1,stroke:#37474f,stroke-width:2px
+```

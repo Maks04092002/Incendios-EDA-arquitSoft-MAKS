@@ -1,3 +1,4 @@
+```mermaid
 graph TB
     BUS[("🐇 RabbitMQ Bus")]
     DB[("🗄️ PostgreSQL + PostGIS")]
@@ -19,3 +20,4 @@ graph TB
     PRODUCER -->|Evento: AlertaGenerada| BUS
 
     style ServicioProcesamiento fill:#fbe9e7,stroke:#d84315,stroke-width:2px
+```
