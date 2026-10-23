@@ -43,7 +43,7 @@ Este proyecto diseña una arquitectura de software orientada a eventos (EDA) y b
 - [Patrones de Diseño (GoF y EDA)](03-diseño-de-software/diseño-interno/patrones-de-diseño.md)
 
 ### 4. Modelo C4
-- [Nivel 1: Diagrama de Contexto del Sistema](04-modelo-c4/Nivel1-DiagramadeContextodelsistema.md)
+- [Nivel 1: Diagrama de Contexto del Sistema](04-modelo-c4/Nivel1-DiagramadeContextodelSistema.md)
 - [Nivel 2: Diagrama de Contenedores](04-modelo-c4/Nivel2-DiagramadeContenedores.md)
 - [Nivel 3: Diagrama de Componentes](04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)
 - [Nivel 4: Diagrama de Código](04-modelo-c4/Nivel4-DiagramadeCodigo.md)
@@ -148,4 +148,4 @@ graph TB
     BROKER --> NOTIF
     GATEWAY --> DB
     NOTIF -.->|WebSockets / SMS| WEBGIS
-
+```
