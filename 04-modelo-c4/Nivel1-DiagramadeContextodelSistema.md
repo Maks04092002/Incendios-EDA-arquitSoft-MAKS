@@ -12,7 +12,6 @@ flowchart LR
     Admin["Administrador del sistema"]
     Sistema["Sistema de monitoreo de puntos de calor y evaluación experimental de riesgo"]
     FIRMS["NASA FIRMS"]
-    Notif["Proveedor externo de notificaciones"]
 
     COEN -->|Consulta monitoreo| Sistema
     SERFOR -->|Consulta contexto territorial| Sistema
@@ -20,7 +19,6 @@ flowchart LR
     Brigada -->|Recibe notificaciones| Sistema
     Admin -->|Administra acceso y configuración| Sistema
     FIRMS -->|Proporciona observaciones satelitales| Sistema
-    Sistema -->|Solicita entrega de notificaciones| Notif
 ```
 
 El sistema trabaja con observaciones satelitales y evaluaciones

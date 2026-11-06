@@ -1,70 +1,73 @@
 # Enfoque Arquitectónico del Sistema
 
-## 1. Visión General del Enfoque
+## 1. Enfoque general
 
-El sistema para el **Monitoreo de Puntos de Calor Satelitales y Generación de Alertas de Riesgo de Incendios Forestales en el Perú** adopta un enfoque híbrido centrado en la **Arquitectura Dirigida por Eventos (Event-Driven Architecture - EDA)**, complementado con principios de **Clean Architecture** (Arquitectura Limpia) y un esquema de **Microservicios Especializados**.
+El sistema adopta la **Arquitectura Orientada a Eventos (EDA)** como estilo
+principal. La ingesta, evaluación, persistencia y generación de alertas se
+desacoplan mediante eventos transportados por RabbitMQ. Las consultas del
+WebGIS y la administración se realizan mediante una API REST síncrona.
 
-Este enfoque responde a la naturaleza de la información satelital ambiental (NASA FIRMS, Copernicus, GOES-16), caracterizada por flujos asíncronos, picos masivos de datos durante temporadas secas e integración con múltiples actores institucionales (COEN, INDECI, SERFOR, Brigadistas).
+Microservicios es una organización distribuida propuesta, no una obligación
+de crear un servicio por cada módulo funcional. La arquitectura en capas
+representa la organización inicial; Clean Architecture y arquitectura
+hexagonal orientan el diseño interno mediante casos de uso, puertos y
+adaptadores.
 
----
+La fuente satelital priorizada en el alcance actual es NASA FIRMS. Copernicus,
+GOES-16 y otras fuentes pueden incorporarse posteriormente mediante nuevos
+adaptadores, sin presentarse como integraciones existentes.
 
-## 2. Principios Rectores del Enfoque
+## 2. Relación con los módulos funcionales
 
-1. **Desacoplamiento Temporal y Espacial:** Los componentes productores de eventos (ingesta satelital) no conocen la existencia ni la ubicación física de los componentes consumidores (evaluador de riesgo, base de datos, notificaciones).
-2. **Procesamiento de Flujos en Tiempo Casi Real (Stream Processing):** Los datos térmicos emitidos por sensores satelitales no se procesan mediante lotes (*batch*) tradicionales, sino en tiempo real conforme arriban al Bus de Eventos.
-3. **Independencia del Dominio (Clean / Hexagonal Architecture):** Las reglas de clasificación de riesgo por incendios y cálculo de temperaturas de brillo permanecen aisladas de los marcos de trabajo (*frameworks*), bases de datos y proveedores externos.
-4. **Resiliencia Geoespacial:** La caída temporal de un proveedor externo de datos satelitales o de un servicio de notificaciones no interrumpe el funcionamiento ni provoca la pérdida de datos en el núcleo del sistema.
+Los seis módulos funcionales son:
 
----
+1. **Gestión de Datos Satelitales:** obtiene, valida y normaliza observaciones.
+2. **Gestión de Puntos de Calor:** registra, consulta y administra observaciones.
+3. **Evaluación Experimental del Riesgo:** aplica reglas versionadas y experimentales.
+4. **Monitoreo Geoespacial:** visualiza observaciones y evaluaciones en mapas.
+5. **Gestión de Alertas:** genera, registra y presenta notificaciones experimentales.
+6. **Administración del Sistema:** administra usuarios, permisos, configuración y auditoría.
 
-## 3. Relación con los Atributos de Calidad
+Los módulos son capacidades funcionales. RabbitMQ, PostgreSQL, PostGIS,
+FastAPI, Python, React y Leaflet son infraestructura o tecnologías previstas.
 
-| Atributo de Calidad | Decisión de Enfoque | Impacto en el Sistema |
+## 3. Decisiones de enfoque
+
+| Decisión | Justificación | Estado |
 | :--- | :--- | :--- |
-| **AC01 - Rendimiento** | Uso de un Message Broker asíncrono (RabbitMQ / Apache Kafka) | Minimiza la latencia de procesamiento a menos de 3 segundos desde la ingesta. |
-| **AC02 - Escalabilidad** | Particionamiento regional de temas/colas de mensajes | Permite escalar horizontalmente consumidores durante emergencias por incendios en la Amazonía. |
-| **AC03 - Resiliencia** | Patrón Circuit Breaker y cola de reintentos (*Dead Letter Queue*) | Retiene los eventos satelitales ante fallas de red sin perder información histórica. |
-| **AC04 - Seguridad** | API Gateway centralizado con autenticación JWT / OAuth2 | Protege la capa de servicios expuestos al WebGIS y controla permisos por rol. |
-| **AC05 - Mantenibilidad** | Separación estricta de responsabilidades por capas y servicios | Permite actualizar algoritmos de riesgo o proveedores sin afectar la ingesta de datos. |
+| EDA con RabbitMQ | Desacopla productores y consumidores y permite procesar eventos de forma asíncrona. | Propuesta |
+| API REST | Permite consultas síncronas del WebGIS y operaciones administrativas. | Propuesta |
+| Clean Architecture | Mantiene las reglas de dominio independientes de frameworks y proveedores. | Propuesta |
+| Arquitectura hexagonal | Define puertos para eventos, persistencia, fuentes y notificaciones. | Propuesta |
+| Microservicios | Permite distribuir responsabilidades cuando el tamaño y las pruebas lo justifiquen. | Propuesta |
 
----
+No se declara una latencia, escalabilidad o tolerancia a fallos como resultado
+obtenido. Esos atributos requieren escenarios, instrumentación y pruebas.
 
-## 4. Diagrama del Enfoque Arquitectónico
+## 4. Flujo de eventos y consultas
+
+La vista modular completa se documenta en
+[estilo-arquitectonico.md](../estilo-arquitectonico.md). El flujo conceptual es:
 
 ```mermaid
-graph TB
-    subgraph Fuentes ["🛰️ Fuentes Satelitales (Productores)"]
-        FIRMS["NASA FIRMS API"]
-        GOES["NOAA GOES-16"]
-        COP["Copernicus Sentinel"]
-    end
-
-    subgraph Broker ["🐇 Bus de Eventos Distribuido (Message Broker)"]
-        TOPIC["Tópico / Cola: anomalías-termicas-peru"]
-    end
-
-    subgraph Servicios ["⚡ Servicios Consumidores (Clean Architecture)"]
-        CEP["🔥 Procesador CEP & Evaluación de Riesgo"]
-        STORE["🗄️ Servicio de Persistencia Espacio-Temporal"]
-        ALERT["🔔 Servicio de Alertas Multicanal"]
-    end
-
-    subgraph Salidas ["🌐 Visualización y Notificación"]
-        DB[("PostgreSQL + PostGIS")]
-        WEB["WebGIS (React + Leaflet)"]
-        NOTIF["SMS / Webhooks / Email"]
-    end
-
-    Fuentes -->|Eventos GeoJSON| TOPIC
-    TOPIC -->|Consumo en flujo| CEP
-    TOPIC -->|Consumo asíncrono| STORE
-    CEP -->|Evento: AlertaGenerada| ALERT
-
-    STORE --> DB
-    ALERT --> NOTIF
-    CEP -.->|WebSockets| WEB
-
-    style Broker fill:#ff6f00,color:#fff,stroke:#e65100,stroke-width:2px
-    style Servicios fill:#2e7d32,color:#fff,stroke:#1b5e20,stroke-width:2px
-    style Fuentes fill:#0277bd,color:#fff,stroke:#01579b,stroke-width:2px
+flowchart LR
+    FIRMS["NASA FIRMS<br/>Sistema externo"] -->|HTTPS: observaciones| ING["Gestión de Datos Satelitales<br/>Productor"]
+    ING -->|ASÍNCRONO: PuntoCalorDetectado| MQ[("RabbitMQ")]
+    MQ -->|ASÍNCRONO| PROC["Gestión de Puntos de Calor y Evaluación Experimental<br/>Consumidores"]
+    PROC -->|ASÍNCRONO: AlertaGenerada| MQ
+    MQ -->|ASÍNCRONO| ALERT["Gestión de Alertas<br/>Consumidor"]
+    PROC -->|Persistencia mediante repositorio| DB[("PostgreSQL + PostGIS")]
+    WEB["Monitoreo Geoespacial<br/>WebGIS"] -->|SÍNCRONO: HTTPS/REST| API["API de Consulta"]
+    API -->|SÍNCRONO: consultas| DB
+    ADMIN["Administración del Sistema"] -->|SÍNCRONO: HTTPS/REST| ADMIN_API["API de Administración"]
+    ADMIN_API -->|SÍNCRONO: configuración y auditoría| DB
 ```
+
+El broker no escribe directamente en la base de datos. Un consumidor o
+servicio de persistencia utiliza un repositorio para guardar los eventos.
+
+## 5. Estado de implementación
+
+El repositorio actual contiene un boilerplate Angular de marketplace y no
+contiene todavía la integración NASA FIRMS, los servicios Python/FastAPI,
+RabbitMQ ni PostgreSQL/PostGIS descritos en este enfoque.

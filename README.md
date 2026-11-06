@@ -23,7 +23,17 @@ La integración satelital, los servicios Python/FastAPI, RabbitMQ,
 PostgreSQL/PostGIS y el WebGIS de monitoreo todavía no están implementados en
 este repositorio.
 
-## Módulos funcionales
+## Estilo arquitectónico y módulos funcionales
+
+La **Arquitectura Orientada a Eventos (EDA)** es el estilo principal. La
+comunicación entre productores y consumidores usa eventos asíncronos mediante
+RabbitMQ, mientras que las consultas del WebGIS y la administración usan una
+API REST síncrona. Microservicios, arquitectura en capas, Clean Architecture y
+arquitectura hexagonal son enfoques complementarios; SOLID y los patrones son
+principios de diseño interno, no estilos arquitectónicos.
+
+La vista modular y el flujo de eventos se encuentran en
+[«Vista modular y flujo de eventos – EDA»](02-arquitectura-de-software/estilo-arquitectonico.md).
 
 1. **Gestión de Datos Satelitales:** incorporación, adaptación y validación de observaciones.
 2. **Gestión de Puntos de Calor:** registro, consulta y conservación de observaciones.
@@ -58,6 +68,7 @@ Strategy, Repository y Publish/Subscribe son decisiones de diseño propuestas.
 - [Historias de usuario](01-analisis-de-sistema/02-historias-del-usuario.md)
 - [Requisitos funcionales](01-analisis-de-sistema/03-requisitos-funcionales.md)
 - [Atributos de calidad](01-analisis-de-sistema/04-atributos-de-calidad.md)
+- [Medición de atributos de calidad](01-analisis-de-sistema/medicion-atributos-calidad.md)
 - [Restricciones](01-analisis-de-sistema/05-restricciones.md)
 - [Drivers arquitectónicos](01-analisis-de-sistema/06-driver-arquitectónicos.md)
 - [Decisiones arquitectónicas](01-analisis-de-sistema/07_Desicion_Arquitectonica.md)
