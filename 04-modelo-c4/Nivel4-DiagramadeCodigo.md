@@ -1,22 +1,49 @@
-```mermaid
-sequenceDiagram
-    autonumber
-    participant FIRMS as 🛰️ NASA FIRMS API
-    participant Ingest as 🐍 Servicio Ingesta
-    participant Rabbit as 🐇 RabbitMQ (Bus)
-    participant Worker as ⚡ Worker Procesamiento
-    participant PostGIS as 🗄️ PostgreSQL / PostGIS
-    participant WebGIS as 💻 WebGIS (React+Leaflet)
+# C4 — Nivel de Código
 
-    Ingest->>FIRMS: 1. Polling / Consulta de puntos de calor (Perú)
-    FIRMS-->>Ingest: 2. Registros JSON/CSV (Lat, Lon, Brightness, Confidence)
-    Ingest->>Rabbit: 3. Publica evento 'PuntoCalorDetectado'
-    Rabbit->>Worker: 4. Entrega mensaje de evento a la cola
-    Worker->>Worker: 5. Valida coordenadas y calcula nivel de riesgo
-    Worker->>PostGIS: 6. ST_SetSRID(ST_MakePoint(lon, lat), 4326) [SQL]
-    PostGIS-->>Worker: 7. Registro guardado exitosamente
-    alt Riesgo Alto (Confidence > 80% y Brightness > 330K)
-        Worker->>Rabbit: 8. Publica evento 'AlertaRiesgoIncendio'
-        Rabbit-->>WebGIS: 9. Notificación en tiempo real / Actualización de mapa
-    end
+## Diseño propuesto: componente `ProcesarPuntoCalor`
+
+Este nivel representa clases e interfaces de un componente concreto. Los
+tipos son diseño propuesto: no existen todavía en el código real del
+repositorio.
+
+```mermaid
+classDiagram
+    class ConsumidorEventos {
+        +recibir(evento)
+    }
+    class ProcesarPuntoCalor {
+        +ejecutar(evento)
+    }
+    class ValidadorPuntoCalor {
+        +validar(evento) ResultadoValidacion
+    }
+    class EvaluadorRiesgo {
+        +evaluar(punto) EvaluacionRiesgo
+    }
+    class EstrategiaEvaluacion {
+        <<interface>>
+        +evaluar(punto) NivelRiesgoExperimental
+    }
+    class PuntoCalorRepository {
+        <<interface>>
+        +guardar(punto)
+    }
+    class EventPublisher {
+        <<interface>>
+        +publicar(evento)
+    }
+    class EstrategiaBasica {
+        +evaluar(punto) NivelRiesgoExperimental
+    }
+
+    ConsumidorEventos --> ProcesarPuntoCalor
+    ProcesarPuntoCalor --> ValidadorPuntoCalor
+    ProcesarPuntoCalor --> EvaluadorRiesgo
+    ProcesarPuntoCalor --> PuntoCalorRepository
+    ProcesarPuntoCalor --> EventPublisher
+    EvaluadorRiesgo --> EstrategiaEvaluacion
+    EstrategiaEvaluacion <|.. EstrategiaBasica
 ```
+
+Las reglas de `EstrategiaBasica` deben validarse experimentalmente. No se
+define aquí un umbral térmico como confirmación de incendio.

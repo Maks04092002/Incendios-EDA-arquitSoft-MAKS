@@ -1,11 +1,15 @@
-# Escenarios de Atributos de Calidad (Estructura ATAM)
+# Escenarios de Atributos de Calidad
 
-Los escenarios de atributos de calidad detallan el comportamiento esperado del sistema ante estímulos específicos, fundamentados en el marco metodológico ATAM y la norma ISO/IEC 25010.
+Los siguientes escenarios son propuestas de validación. Las medidas no se
+consideran resultados hasta ejecutar pruebas con datos y ambiente definidos.
 
-| ID | Atributo de Calidad | Fuente del Estímulo | Estímulo | Artefacto | Entorno | Respuesta del Sistema | Medida de Respuesta |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **ESC01** | **Rendimiento** (AC01) | NASA FIRMS API / GOES-16 | Arribo de una anomalía térmica con temperatura de brillo > 330 K. | Microservicio de Ingesta y Motor CEP | Operación normal en horas pico. | Ingesta, procesamiento en flujo, cálculo de nivel de riesgo y publicación del evento de alerta. | Latencia total de procesamiento e ingesta menor a **3 segundos**. |
-| **ESC02** | **Escalabilidad** (AC02) | Temporada seca en la Amazonía | Incremento masivo repentino a 10,000 eventos térmicos simultáneos por minuto. | Bus de Eventos (Kafka/RabbitMQ) | Carga pico extraordinaria. | Asignación dinámica de particiones regionales y auto-escalado horizontal de workers de consumo. | Cero pérdida de mensajes y tasa de procesamiento estable sin degradación del servicio. |
-| **ESC03** | **Disponibilidad y Resiliencia** (AC03) | API Externa de NASA FIRMS | Caída temporal de conexión o timeout en el proveedor externo durante 15 minutos. | Adaptador de Ingesta Satelital | Fallo de red externa. | Activación del patrón Circuit Breaker, almacenamiento en búfer local de reintentos asíncronos exponencial. | Recuperación automática del 100% de registros omitidos al restablecer el servicio sin caída del backend. |
-| **ESC04** | **Seguridad** (AC04) | Usuario no autorizado | Intento de enviar comandos o acceder a endpoints del API Gateway sin token válido. | API Gateway y Módulo de Autenticación | Operación pública. | Intercepción de la solicitud, denegación del acceso y registro del evento de auditoría. | Respuesta HTTP 401 Unauthorized en menos de **50 ms**. |
-| **ESC05** | **Mantenibilidad** (AC05) | Equipo de Desarrollo | Reemplazo del proveedor de SMS Gateway por un nuevo servicio de mensajería Push. | Capa de Adaptadores e Infraestructura | Mantenimiento evolutivo. | Modificación exclusiva del adaptador externo sin alterar la lógica de dominio o del cálculo de riesgo. | Modificación completada y desplegada sin afectar la estabilidad ni el código de otros microservicios. |
+| ID | Atributo | Estímulo | Respuesta esperada | Medición pendiente |
+| :--- | :--- | :--- | :--- | :--- |
+| ESC01 | Rendimiento | Llega una observación disponible desde la fuente | Ingesta, procesamiento y notificación registran marcas de tiempo separadas | Medir cada intervalo; no se fija una cifra sin evidencia |
+| ESC02 | Escalabilidad | Aumenta el volumen de observaciones | Se agregan consumidores sin cambiar el productor | Definir carga, capacidad y pérdida aceptable |
+| ESC03 | Resiliencia | La fuente o canal externo presenta timeout | Se aplica reintento o buffer según política y se registra el resultado | Medir recuperación, duplicados y eventos no entregados |
+| ESC04 | Seguridad | Solicitud sin credenciales o con rol insuficiente | La API rechaza la operación y audita el intento | Medir respuestas y cobertura de permisos |
+| ESC05 | Mantenibilidad | Se reemplaza un proveedor externo | Se modifica el adaptador sin cambiar reglas del dominio | Verificar pruebas de contrato y regresión |
+
+Un punto de calor usado en estos escenarios sigue siendo una observación; no
+se considera un incendio confirmado.

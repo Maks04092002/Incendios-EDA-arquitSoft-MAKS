@@ -1,10 +1,18 @@
 # Historias de Usuario
 
+Las historias describen capacidades esperadas del sistema. Un punto de calor
+es una observación satelital y no constituye, por sí solo, un incendio
+confirmado.
+
 | ID | Historia de Usuario |
 | :--- | :--- |
-| **HU01** | Como **analista del COEN**, quiero **visualizar en un mapa en tiempo real (WebGIS) los focos de calor**, para **identificar incendios incipientes en el territorio peruano**. |
-| **HU02** | Como **brigadista local**, quiero **recibir alertas instantáneas vía SMS/Email cuando el riesgo sea Alto o Crítico**, para **desplazarme rápidamente a la zona afectada**. |
-| **HU03** | Como **gestor de SERFOR**, quiero **correlacionar focos térmicos con capas de vegetación (ANP/Bosques)**, para **priorizar la atención en ecosistemas frágiles**. |
-| **HU04** | Como **administrador**, quiero **particionar el bus de eventos por regiones (Norte, Centro, Sur, Oriente)**, para **garantizar el procesamiento escalable de datos satelitales**. |
-| **HU05** | Como **analista de INDECI**, quiero **exportar reportes consolidados en PDF/Excel**, para **sustentar informes de emergencia institucional**. |
-| **HU06** | Como **sistema de ingesta**, quiero **almacenar datos históricos en series de tiempo**, para **realizar análisis de tendencias de incendios forestales**. |
+| **HU01** | Como analista del COEN, quiero visualizar puntos de calor y evaluaciones experimentales en un WebGIS, para apoyar el monitoreo territorial. |
+| **HU02** | Como brigadista local, quiero recibir una notificación cuando una evaluación experimental alcance un nivel configurado, para revisar oportunamente la zona observada. |
+| **HU03** | Como gestor de SERFOR, quiero consultar puntos de calor junto con capas territoriales, para priorizar el análisis de áreas sensibles. |
+| **HU04** | Como administrador, quiero gestionar usuarios, permisos y configuración operativa, para controlar el acceso al sistema. |
+| **HU05** | Como analista de INDECI, quiero exportar información histórica disponible, para elaborar informes institucionales. |
+| **HU06** | Como responsable de datos, quiero conservar observaciones históricas, para realizar análisis posteriores de tendencias. |
+
+Las expresiones “oportunamente” y “tiempo real” no representan una garantía
+de latencia. La disponibilidad de la observación satelital, el procesamiento
+interno y la entrega de la notificación deben medirse por separado.
