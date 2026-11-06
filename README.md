@@ -1,151 +1,100 @@
 # Arquitectura Orientada a Eventos (EDA) para Monitoreo de Puntos de Calor e Incendios Forestales en el Perú
 
 **Curso:** Arquitectura de Software (IS-488)  
-**Institución:** Universidad Nacional de San Cristóbal de Huamanga (UNSCH)  
-**Escuela:** EP Ingeniería de Sistemas  
-**Docente:** Mg. Ing. Richard Zapata Casaverde / Ing. Lizbeth Jaico Quispe  
+**Institución:** Universidad Nacional de San Cristóbal de Huamanga (UNSCH)
 
----
+## Objetivo
 
-## 👤 Datos del Estudiante
-- **Nombre:** MAKS BRAYAN TANTA CHALA
-- **Código:** 27221202
-- **Repositorio GitHub:** [Incendios-EDA-arquitSoft-MAKS](https://github.com/Maks04092002/Incendios-EDA-arquitSoft-MAKS)
+Diseñar una arquitectura orientada a eventos para recibir observaciones de
+puntos de calor satelitales, evaluarlas experimentalmente y apoyar el
+monitoreo geoespacial y la distribución de alertas. Una observación de punto
+de calor no se interpreta como confirmación de incendio.
 
----
+## Alcance del Sprint 1
 
-## 📌 Resumen del Proyecto
-Este proyecto diseña una arquitectura de software orientada a eventos (EDA) y basada en microservicios para la ingesta, análisis y procesamiento en tiempo real de telemetría satelital (**NASA FIRMS, Copernicus, GOES-16**). El objetivo principal es reducir la latencia de detección de focos de calor e incendios forestales en el territorio peruano de horas a segundos, permitiendo la generación y distribución automática de alertas críticas a SERFOR, INDECI, COEN, autoridades regionales y brigadas de campo.
+- Definición de actores, historias y requisitos.
+- Separación de seis módulos funcionales.
+- Diseño propuesto EDA, Clean Architecture y arquitectura hexagonal.
+- Vistas C4 editables en Mermaid.
+- Boilerplate Angular con pruebas de dominio independiente, heredado como
+  material de referencia para separación de capas.
 
----
+La integración satelital, los servicios Python/FastAPI, RabbitMQ,
+PostgreSQL/PostGIS y el WebGIS de monitoreo todavía no están implementados en
+este repositorio.
 
-## 📁 Índice de Documentación del Repositorio
+## Módulos funcionales
 
-### 1. Análisis del Sistema
-- [01 - Actores del Sistema](01-analisis-de-sistema/01-actores.md)
-- [02 - Historias de Usuario](01-analisis-de-sistema/02-historias-del-usuario.md)
-- [03 - Requisitos Funcionales](01-analisis-de-sistema/03-requisitos-funcionales.md)
-- [04 - Atributos de Calidad](01-analisis-de-sistema/04-atributos-de-calidad.md)
-- [05 - Restricciones del Sistema](01-analisis-de-sistema/05-restricciones.md)
-- [06 - Drivers Arquitectónicos](01-analisis-de-sistema/06-driver-arquitectónicos.md)
-- [07 - Decisiones Arquitectónicas](01-analisis-de-sistema/07_Desicion_Arquitectonica.md)
-- [08 - Escenarios de Atributos de Calidad](01-analisis-de-sistema/08-escenarios-atributos-calidad.md)
+1. **Gestión de Datos Satelitales:** incorporación, adaptación y validación de observaciones.
+2. **Gestión de Puntos de Calor:** registro, consulta y conservación de observaciones.
+3. **Evaluación Experimental del Riesgo:** aplicación de reglas versionadas y pendientes de validación.
+4. **Monitoreo Geoespacial:** consulta y visualización territorial.
+5. **Gestión de Alertas:** generación y distribución de notificaciones configuradas.
+6. **Administración del Sistema:** usuarios, permisos, parámetros y auditoría.
 
-### 2. Arquitectura de Software
-- [Enfoque Arquitectónico](02-arquitectura-de-software/enfoque/enfoque-arquitectonico.md)
-- [Arquitectura Inicial](02-arquitectura-de-software/arquitectura-inicial.md)
-- [Estilo Arquitectónico](02-arquitectura-de-software/estilo-arquitectonico.md)
-- [Componentes Arquitectónicos](02-arquitectura-de-software/componentes-arquitectonicos.md)
+RabbitMQ, PostgreSQL, PostGIS y FastAPI son infraestructura o tecnologías,
+no módulos funcionales. Los microservicios son una posible división de
+implementación.
 
-### 3. Diseño de Software (Diseño Interno)
-- [Diseño Interno de Módulos (Consolidado)](03-diseño-de-software/diseño-interno/diseño-interno-de-modulos.md)
-- [Principios de Diseño (SOLID)](03-diseño-de-software/diseño-interno/principios-de-diseño.md)
-- [Patrones de Diseño (GoF y EDA)](03-diseño-de-software/diseño-interno/patrones-de-diseño.md)
+## Estilo y tecnologías previstas
 
-### 4. Modelo C4
-- [Nivel 1: Diagrama de Contexto del Sistema](04-modelo-c4/Nivel1-DiagramadeContextodelSistema.md)
-- [Nivel 2: Diagrama de Contenedores](04-modelo-c4/Nivel2-DiagramadeContenedores.md)
-- [Nivel 3: Diagrama de Componentes](04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)
-- [Nivel 4: Diagrama de Código](04-modelo-c4/Nivel4-DiagramadeCodigo.md)
+EDA es el estilo principal. Clean Architecture y arquitectura hexagonal
+separan dominio, aplicación, puertos y adaptadores. Los patrones Adapter,
+Strategy, Repository y Publish/Subscribe son decisiones de diseño propuestas.
 
----
+| Área | Tecnología prevista | Estado |
+| :--- | :--- | :--- |
+| Fuente | NASA FIRMS | No integrada |
+| Backend | Python + FastAPI | No presente |
+| Eventos | RabbitMQ | No presente |
+| Datos | PostgreSQL + PostGIS | No presente |
+| WebGIS | React + Leaflet | No presente; el boilerplate usa Angular |
 
-## 🖼️ Galería de Diagramas de Arquitectura (Exportados)
+## Documentación
 
-A continuación se presentan los diagramas clave de la arquitectura, patrones y diseño interno exportados desde la herramienta de modelado.
+### Análisis del sistema
 
-### 🏛️ Modelo C4
-**Nivel 1: Diagrama de Contexto**
-![Contexto](imagen/fuentes-svg/nivel1_contexto_monitoreo_incendios.png)
+- [Actores](01-analisis-de-sistema/01-actores.md)
+- [Historias de usuario](01-analisis-de-sistema/02-historias-del-usuario.md)
+- [Requisitos funcionales](01-analisis-de-sistema/03-requisitos-funcionales.md)
+- [Atributos de calidad](01-analisis-de-sistema/04-atributos-de-calidad.md)
+- [Restricciones](01-analisis-de-sistema/05-restricciones.md)
+- [Drivers arquitectónicos](01-analisis-de-sistema/06-driver-arquitectónicos.md)
+- [Decisiones arquitectónicas](01-analisis-de-sistema/07_Desicion_Arquitectonica.md)
+- [Escenarios de calidad](01-analisis-de-sistema/08-escenarios-atributos-calidad.md)
 
-**Nivel 2: Diagrama de Contenedores**
-![Contenedores](imagen/fuentes-svg/nivel2_contenedores_monitoreo_incendios.png)
+### Arquitectura y diseño
 
-**Nivel 3: Diagrama de Componentes (Microservicio CEP)**
-![Componentes](imagen/fuentes-svg/nivel3_componentes_ms_cep.png)
+- [Arquitectura inicial en capas](02-arquitectura-de-software/arquitectura-inicial.md)
+- [Estilo arquitectónico](02-arquitectura-de-software/estilo-arquitectonico.md)
+- [Componentes y módulos](02-arquitectura-de-software/componentes-arquitectonicos.md)
+- [Diseño interno](03-diseño-de-software/diseño-interno/diseño-interno-de-modulos.md)
+- [Principios SOLID](03-diseño-de-software/diseño-interno/principios-de-diseño.md)
+- [Patrones](03-diseño-de-software/diseño-interno/patrones-de-diseño.md)
 
-**Nivel 4: Diagrama de Clases**
-![Clases Nivel 4](imagen/fuentes-svg/nivel4-clases.svg.svg)
+### Modelo C4
 
-**Nivel 4: Diagrama de Secuencia**
-![Secuencia Nivel 4](imagen/fuentes-svg/nivel4-secuencia.svg.svg)
+- [C1 — Contexto](04-modelo-c4/Nivel1-DiagramadeContextodelSistema.md)
+- [C2 — Contenedores](04-modelo-c4/Nivel2-DiagramadeContenedores.md)
+- [C3 — Componentes](04-modelo-c4/Nivel3-Diagrama-de-Componentes.md)
+- [C4 — Código](04-modelo-c4/Nivel4-DiagramadeCodigo.md)
+- [Vista dinámica — Secuencia](04-modelo-c4/Vista-Dinamica-Secuencia.md)
 
----
+## Código y ejecución comprobada
 
-### 🧩 Patrones de Diseño Aplicados (GoF)
+El código real está en [boilerplate-main/boilerplate-main](boilerplate-main/boilerplate-main)
+y corresponde a un marketplace Angular de productos para mascotas. Sus
+comandos se documentan en su [README](boilerplate-main/boilerplate-main/README.md).
+No se declara aquí que esos comandos ejecuten el sistema satelital.
 
-**Patrón Adapter (Integración con NASA FIRMS)**
-![Adapter](imagen/fuentes-svg/patron-adapter.svg.svg)
+## Próximos pasos
 
-**Patrón Strategy (Motor de Reglas por Región)**
-![Strategy](imagen/fuentes-svg/patron-strategy.svg.svg)
+1. Validar las reglas experimentales con datos y criterios del dominio.
+2. Definir contratos de eventos, versionado, idempotencia y reintentos.
+3. Implementar de forma incremental ingesta, procesamiento, persistencia,
+   consulta y alertas.
+4. Incorporar pruebas de contrato, integración y mediciones separadas de
+   observación, procesamiento y notificación.
 
-**Patrón Observer (Event-Driven Architecture)**
-![Observer](imagen/observador-patrón.svg.png)
-
-**Patrón Factory (Creación de Alertas)**
-![Factory](imagen/patron-factory.svg.png)
-
-**Patrón Facade (Consolidación de APIs Satelitales)**
-![Facade](imagen/fachada-patrón.svg.png)
-
----
-
-### 📐 Principios SOLID y Diseño Interno
-
-**Principio de Inversión de Dependencias (DIP)**
-![Principio DIP](imagen/fuentes-svg/principio-dip.svg.svg)
-
-**Diagrama de Paquetes (Módulo Incendios)**
-![Paquetes](imagen/paquetes-modulo-incendios.svg.png)
-
-**Secuencia: Creación de Alerta Crítica**
-![Secuencia Alerta](imagen/secuencia-crear-alerta.svg.png)
-
----
-
-## 🛠️ Tecnologías y Stack Técnico
-- **Ingesta y Microservicios:** Python 3.11, FastAPI, Celery
-- **Event Broker:** RabbitMQ / Apache Kafka (AMQP/TCP)
-- **Motor CEP & Flujo:** Python CEP / RxPY / Apache Flink
-- **Base de Datos Espacial:** PostgreSQL 16 + PostGIS 3.4 + TimescaleDB
-- **Visualización & WebGIS:** React.js, Leaflet / Mapbox, WebSockets, Tailwind CSS
-- **Fuentes Satelitales:** NASA FIRMS (VIIRS/MODIS), Copernicus (Sentinel), NOAA GOES-16
-
----
-
-## 🏛️ Vista General de la Arquitectura
-
-```mermaid
-graph TB
-    subgraph Fuentes ["📡 Fuentes Satelitales"]
-        NASA["🛰️ NASA FIRMS API"]
-        COP["🛰️ Copernicus"]
-        GOES["🛰️ NOAA GOES-16"]
-    end
-
-    subgraph Ingesta ["⚡ Ingesta & Procesamiento"]
-        INGEST["🐍 ms-ingesta-satelital"]
-        BROKER[("🐇 RabbitMQ Broker")]
-        CEP["🔥 ms-procesador-cep"]
-    end
-
-    subgraph Persistencia ["🗄️ Almacenamiento GIS"]
-        DB[("PostgreSQL + PostGIS")]
-    end
-
-    subgraph Presentacion ["📢 Presentación & Alertas"]
-        GATEWAY["🚀 ms-api-gateway"]
-        NOTIF["🔔 ms-notificaciones-alertas"]
-        WEBGIS["💻 Plataforma WebGIS"]
-    end
-
-    Fuentes --> INGEST
-    INGEST -->|PuntoCalorDetectado| BROKER
-    BROKER --> CEP
-    CEP -->|AlertaGenerada| BROKER
-    BROKER --> DB
-    BROKER --> NOTIF
-    GATEWAY --> DB
-    NOTIF -.->|WebSockets / SMS| WEBGIS
-```
+Para el detalle de la auditoría y de los pendientes, consulte
+[REVISION_ARQUITECTURA.md](REVISION_ARQUITECTURA.md).

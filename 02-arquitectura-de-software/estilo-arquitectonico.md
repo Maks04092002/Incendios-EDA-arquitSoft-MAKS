@@ -1,68 +1,93 @@
-# Estilos Arquitectónicos Seleccionados
+# Estilo Arquitectónico
 
-El diseño del sistema de monitoreo de incendios forestales combina estratégicamente tres estilos arquitectónicos complementarios para satisfacer los atributos de calidad requeridos.
+## EDA como estilo principal
 
----
+La Arquitectura Orientada a Eventos (EDA) es el estilo principal propuesto.
+Los productores publican eventos y los consumidores reaccionan de forma
+asíncrona mediante un broker. El diseño no implica que todos los flujos sean
+asíncronos: las consultas del WebGIS pueden usar HTTP/REST hacia una API.
 
-## 1. Análisis de Estilos Arquitectónicos
+Eventos propuestos:
 
-### 1.1. Arquitectura Orientada a Eventos (EDA - Estilo Principal)
-* **Descripción:** Los componentes interactúan mediante la emisión, detección y consumo de eventos térmicos georreferenciados.
-* **Rol en el Sistema:** Controla todo el ciclo de vida del dato desde la ingesta satelital hasta la notificación de peligro.
-* **Mecanismos:**
-  * **Event Producer:** Servicio de Ingesta Satelital (NASA FIRMS / GOES-16).
-  * **Event Broker:** RabbitMQ / Apache Kafka con soporte para colas regionales.
-  * **Event Consumer:** Servicio CEP de evaluación de riesgo, Servicio de Notificaciones, Servicio de Persistencia.
+- `PuntoCalorDetectado`: observación normalizada, no incendio confirmado.
+- `EvaluacionRiesgoCalculada`: resultado experimental versionado.
+- `AlertaGenerada`: resultado que cumple una regla de notificación configurada.
 
-### 1.2. Arquitectura de Microservicios
-* **Descripción:** División de las capacidades del sistema en servicios autónomos con bases de datos o esquemas especializados, desplegados de forma independiente mediante contenedores Docker.
-* **Microservicios Definidos:**
-  1. `ms-ingesta-satelital`: Polling e ingesta de APIs públicas.
-  2. `ms-procesador-cep`: Motor de reglas y evaluación de riesgo térmico.
-  3. `ms-notificaciones-alertas`: Despacho multicanal de alertas (SMS, Webhooks, WebSockets).
-  4. `ms-api-webgis`: Gateway de lectura de mapas e historial.
+## Arquitectura inicial en capas
 
-### 1.3. Arquitectura Hexagonal (Puertos y Adaptadores)
-* **Descripción:** Aísla el núcleo del dominio (cálculo de riesgo por incendio) de las dependencias externas (RabbitMQ, PostGIS, FastAPI, APIs satelitales).
-* **Aplicación:** Permite sustituir la tecnología de mensajería (ejemplo: cambiar RabbitMQ por Kafka) o la pasarela de SMS sin modificar una sola línea de código de las reglas de negocio.
+La arquitectura inicial en capas sirve como modelo de separación para el
+prototipo:
 
----
+1. **Presentación:** WebGIS y API de consulta.
+2. **Aplicación y dominio:** casos de uso, validación y evaluación experimental.
+3. **Adaptadores e infraestructura:** fuentes externas, broker y persistencia.
 
-## 2. Matriz Comparativa de Estilos Arquitectónicos
+La evolución a EDA desacopla los flujos de ingesta, procesamiento,
+persistencia y notificación; no elimina la separación de responsabilidades.
 
-| Criterio de Evaluación | Monolito Tradicional | Arquitectura en Capas | Microservicios + EDA (Seleccionado) |
-| :--- | :--- | :--- | :--- |
-| **Latencia de Alerta** | Alta (Procesamiento Batch) | Media | **Muy Baja (< 3s)** |
-| **Tolerancia a Fallas** | Baja (Punto único de falla) | Media | **Alta (Aislamiento por microservicio)** |
-| **Escalabilidad** | Monolítica (Costosa) | Vertical | **Horizontal independiente por evento** |
-| **Desacoplamiento** | Bajo | Moderado (Lógico) | **Estrictamente Desacoplado** |
-| **Complejidad de Operación** | Muy Baja | Baja | **Media-Alta (Orquestado con Docker)** |
+## Diagrama del estilo EDA propuesto
 
----
-
-## 3. Integración de los Estilos Arquitectónicos
+El siguiente diagrama muestra la comunicación asíncrona prevista y la
+separación entre servicios, broker y persistencia. Es un diseño propuesto; no
+representa una implementación existente.
 
 ```mermaid
-graph LR
-    subgraph CapaIngesta ["📡 Microservicio Ingesta"]
-        FIRMS["NASA FIRMS"] -->|Adaptador HTTP| ING_CORE["Core Ingesta"]
-        ING_CORE -->|Puerto Salida| PROD["Event Producer"]
-    end
+flowchart LR
+    FIRMS["NASA FIRMS<br/>Sistema externo"]
+    ING["Servicio de Ingesta<br/>Adaptador de fuente"]
+    BROKER[("RabbitMQ<br/>Broker de eventos")]
+    PROC["Servicio de Procesamiento<br/>Validación y evaluación experimental"]
+    STORE["Servicio de Persistencia<br/>Consumidor de eventos"]
+    ALERT["Servicio de Alertas<br/>Consumidor de eventos"]
+    API["API de Consulta"]
+    WEB["WebGIS<br/>React + Leaflet"]
+    DB[("PostgreSQL + PostGIS")]
+    CANAL["Canales externos<br/>SMS / Email / Webhook"]
 
-    subgraph BusEventos ["🐇 Broker EDA"]
-        PROD -->|Evento GeoJSON| QUEUE[("Cola: anomalías-peru")]
-    end
-
-    subgraph CapaProcesamiento ["⚡ Microservicio CEP (Hexagonal)"]
-        QUEUE -->|Puerto Entrada| CONS["Event Consumer"]
-        CONS --> DOMINIO["🔥 Dominio: Evaluar Riesgo Incendio"]
-        DOMINIO -->|Puerto Salida| ADAP_DB["Adaptador PostGIS"]
-        DOMINIO -->|Puerto Salida| ADAP_NOTIF["Adaptador Alertas"]
-    end
-
-    ADAP_DB --> DB[("PostgreSQL")]
-    ADAP_NOTIF --> WS["WebSockets WebGIS"]
-
-    style BusEventos fill:#ff6f00,color:#fff,stroke:#e65100
-    style DOMINIO fill:#2e7d32,color:#fff,stroke:#1b5e20
+    ING -->|Consulta| FIRMS
+    ING -->|Publica PuntoCalorDetectado| BROKER
+    BROKER -->|Entrega observación| PROC
+    BROKER -->|Entrega observación y evaluación| STORE
+    PROC -->|Publica EvaluacionRiesgoCalculada| BROKER
+    PROC -->|Publica AlertaGenerada si corresponde| BROKER
+    BROKER -->|Entrega AlertaGenerada| ALERT
+    STORE -->|Persiste mediante repositorio| DB
+    API -->|Consulta datos geoespaciales| DB
+    WEB -->|HTTP/REST| API
+    ALERT -->|Solicita entrega| CANAL
 ```
+
+RabbitMQ no persiste directamente en PostgreSQL. El Servicio de Persistencia
+consume los eventos y utiliza un repositorio para guardar la información.
+
+## Clean Architecture y arquitectura hexagonal
+
+El dominio y los casos de uso dependen de puertos, no de FastAPI, RabbitMQ,
+PostgreSQL o SDK de una fuente. Los adaptadores de entrada incluyen
+consumidores de eventos y endpoints; los adaptadores de salida incluyen el
+publicador, repositorio y clientes externos.
+
+Esta organización es un diseño propuesto. El código real inspeccionado es un
+boilerplate Angular de marketplace y no contiene estos servicios.
+
+## Tecnologías previstas
+
+| Área | Tecnología prevista | Estado comprobado |
+| :--- | :--- | :--- |
+| Fuente | NASA FIRMS | No integrada en el código actual |
+| Backend | Python, FastAPI | No presente en el código actual |
+| Mensajería | RabbitMQ | No presente en el código actual |
+| Persistencia | PostgreSQL, PostGIS | No presente en el código actual |
+| Presentación | React, Leaflet | No presente; el boilerplate usa Angular |
+
+## Principios y patrones
+
+- **SOLID:** guía para separar casos de uso, puertos y adaptadores; no prueba
+  que las clases propuestas ya existan.
+- **Adapter:** convierte el contrato de NASA FIRMS al modelo interno.
+- **Strategy:** permite comparar reglas experimentales de evaluación.
+- **Repository:** encapsula persistencia y consultas geoespaciales.
+- **Publish/Subscribe:** desacopla productores y consumidores mediante eventos.
+
+Estos patrones son decisiones de diseño propuestas, no implementaciones
+verificadas en el sistema de monitoreo.

@@ -1,23 +1,36 @@
+# C3 — Componentes del Servicio de Procesamiento
+
+Diseño propuesto del servicio que consume observaciones y calcula una
+evaluación experimental. No corresponde a clases existentes en el boilerplate
+actual.
+
 ```mermaid
-graph TB
-    BUS[("🐇 RabbitMQ Bus")]
-    DB[("🗄️ PostgreSQL + PostGIS")]
-
-    subgraph ServicioProcesamiento ["⚡ Servicio de Procesamiento de Incendios"]
-        CONSUMER["📡 Event Consumer<br/>Escucha la cola 'puntos_calor_queue'"]
-        VALIDATOR["🔍 Validador Geoespacial<br/>Filtra puntos dentro del territorio peruano"]
-        EVALUATOR["🔥 Evaluador de Riesgo<br/>Aplica reglas de temperatura de brillo y confianza"]
-        REPO["🗃️ Repositorio PostGIS<br/>Ejecuta transacciones georreferenciadas"]
-        PRODUCER["📢 Alert Publisher<br/>Publica eventos en la cola 'alertas_queue'"]
+flowchart LR
+    MQ[("RabbitMQ")]
+    subgraph Servicio["Servicio de Procesamiento"]
+        Consumer["Consumidor de eventos<br/>Adaptador de entrada"]
+        UseCase["Caso de uso<br/>ProcesarPuntoCalor"]
+        Validator["Validador<br/>Estructura y coordenadas"]
+        Evaluator["Evaluador experimental<br/>Strategy de reglas"]
+        RepoPort["IPuntoCalorRepository<br/>Puerto de salida"]
+        PublisherPort["IEventPublisher<br/>Puerto de salida"]
+        Repo["Adaptador Repository PostGIS"]
+        Publisher["Adaptador Publisher RabbitMQ"]
     end
+    DB[("PostgreSQL + PostGIS")]
 
-    BUS -->|Evento: PuntoCalorDetectado| CONSUMER
-    CONSUMER --> VALIDATOR
-    VALIDATOR --> EVALUATOR
-    EVALUATOR --> REPO
-    EVALUATOR --> PRODUCER
-    REPO --> DB
-    PRODUCER -->|Evento: AlertaGenerada| BUS
-
-    style ServicioProcesamiento fill:#fbe9e7,stroke:#d84315,stroke-width:2px
+    MQ -->|PuntoCalorDetectado| Consumer
+    Consumer -->|DTO normalizado| UseCase
+    UseCase --> Validator
+    Validator --> Evaluator
+    Evaluator -->|EvaluacionRiesgoCalculada| UseCase
+    UseCase --> RepoPort
+    RepoPort -.implementa.-> Repo
+    Repo -->|SQL/PostGIS| DB
+    UseCase --> PublisherPort
+    PublisherPort -.implementa.-> Publisher
+    Publisher -->|AlertaGenerada, si corresponde| MQ
 ```
+
+El caso de uso depende de interfaces. Las tecnologías solo aparecen en los
+adaptadores.

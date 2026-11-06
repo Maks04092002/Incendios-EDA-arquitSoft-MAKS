@@ -43,14 +43,14 @@ graph TB
 * **Responsabilidad:** Renderizar mapas con marcadores térmicos, mapas de calor (*heatmaps*), filtros por fecha/región y panel de control de alertas activas para los analistas.
 
 ### 2.2. Capa de Lógica de Negocio
-* **Tecnologías:** Python 3.11, FastAPI.
+* **Tecnologías previstas:** Python y FastAPI. No están presentes en el código actual.
 * **Responsabilidad:**
   * Validar las coordenadas geográficas (latitud, longitud) y normalizar el formato de temperatura de brillo (Kelvin/Celsius).
   * Evaluar si la anomalía térmica cae dentro del polígono del territorio peruano.
   * Aplicar la matriz inicial de clasificación de riesgo (Bajo, Medio, Alto, Crítico).
 
 ### 2.3. Capa de Acceso a Datos e Integración
-* **Tecnologías:** PostgreSQL 16, Extensión PostGIS 3.4, SQLAlchemy / GeoAlchemy2.
+* **Tecnologías previstas:** PostgreSQL, PostGIS y un adaptador de persistencia. No están presentes en el código actual.
 * **Responsabilidad:**
   * Conectarse a la API de NASA FIRMS para la ingesta periódica de registros.
   * Almacenar datos vectoriales en tablas espaciales (`GEOMETRY(Point, 4326)`).
