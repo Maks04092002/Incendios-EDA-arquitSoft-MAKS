@@ -91,6 +91,7 @@ flowchart TB
     style INFRAESTRUCTURA fill:#fffbeb,stroke:#d97706,stroke-width:3px
 ```
 
+
 ---
 
 ## 2. Detalle de las Capas Iniciales
