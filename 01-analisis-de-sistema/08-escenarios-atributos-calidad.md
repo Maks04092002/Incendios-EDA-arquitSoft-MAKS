@@ -1,15 +1,19 @@
-# Escenarios de Atributos de Calidad
+# Escenarios de Calidad
 
-Los siguientes escenarios son propuestas de validación. Las medidas no se
-consideran resultados hasta ejecutar pruebas con datos y ambiente definidos.
+Los escenarios son propuestas de medición. Todos permanecen como **NO
+EJECUTADOS** hasta contar con la implementación, el entorno y la evidencia
+correspondientes.
 
-| ID | Atributo | Estímulo | Respuesta esperada | Medición pendiente |
-| :--- | :--- | :--- | :--- | :--- |
-| ESC01 | Rendimiento | Llega una observación disponible desde la fuente | Ingesta, procesamiento y notificación registran marcas de tiempo separadas | Medir cada intervalo; no se fija una cifra sin evidencia |
-| ESC02 | Escalabilidad | Aumenta el volumen de observaciones | Se agregan consumidores sin cambiar el productor | Definir carga, capacidad y pérdida aceptable |
-| ESC03 | Resiliencia | La fuente o canal externo presenta timeout | Se aplica reintento o buffer según política y se registra el resultado | Medir recuperación, duplicados y eventos no entregados |
-| ESC04 | Seguridad | Solicitud sin credenciales o con rol insuficiente | La API rechaza la operación y audita el intento | Medir respuestas y cobertura de permisos |
-| ESC05 | Mantenibilidad | Se reemplaza un proveedor externo | Se modifica el adaptador sin cambiar reglas del dominio | Verificar pruebas de contrato y regresión |
+| ID | Atributo | Estímulo y entorno | Artefacto | Respuesta esperada | Medida y objetivo |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| EC-REN-01 | Rendimiento | 1000 observaciones simuladas en entorno local con RabbitMQ y un consumidor | Procesamiento | Consumir, validar, evaluar y confirmar eventos válidos | p95 desde recepción hasta confirmación; pendiente de línea base |
+| EC-ESC-01 | Escalabilidad | Misma carga con 1, 2 y N consumidores | Broker y consumidores | Aumentar capacidad sin pérdida ni crecimiento sostenido de cola | throughput, cola, CPU y memoria; comparar contra línea base |
+| EC-FIA-01 | Fiabilidad | Reinicio del consumidor y mensajes duplicados | Consumidor y repositorio | Reintentar, confirmar solo tras procesar e impedir duplicación | éxito, duplicados, recuperados y tiempo de recuperación |
+| EC-DIS-01 | Disponibilidad | Interrupción controlada de API o consumidor | API y servicio de procesamiento | Recuperar el servicio y conservar el estado permitido | disponibilidad y MTTR; RTO/RPO pendientes de definir |
+| EC-SEG-01 | Seguridad | Solicitudes con credenciales, roles y entradas válidas/ inválidas | API y administración | Autorizar solo operaciones permitidas y registrar accesos | porcentaje de autorizaciones correctas y rutas sensibles protegidas |
+| EC-MAN-01 | Mantenibilidad | Sustituir un adaptador mediante un cambio controlado | Dominio y adaptadores | Mantener reglas de dominio y limitar pruebas afectadas | cobertura, complejidad, dependencias y pruebas afectadas |
+| EC-INT-01 | Interoperabilidad | CSV/JSON válidos, inválidos y versiones de contrato | Adaptador y eventos | Normalizar válidos y rechazar inválidos con error trazable | registros válidos, mensajes conformes y errores de integración |
+| EC-USA-01 | Usabilidad | Usuarios de prueba ejecutan consulta, filtro y lectura de alerta | WebGIS | Completar tareas sin ambigüedad crítica | tareas completadas, tiempo, errores y cuestionario definido |
 
-Un punto de calor usado en estos escenarios sigue siendo una observación; no
-se considera un incendio confirmado.
+Los procedimientos y plantillas de resultados están en
+[medicion-atributos-calidad.md](medicion-atributos-calidad.md).
